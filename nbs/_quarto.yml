@@ -6,6 +6,8 @@ format:
     theme: zephyr
     css: styles.css
     toc: true
+    page-layout: full
+    link-external-newwindow: true
 
 website:
   twitter-card: true
@@ -15,6 +17,6 @@ website:
     background: primary
     search: true
   sidebar:
-    style: floating
+    style: docked
 
 metadata-files: [nbdev.yml, sidebar.yml]

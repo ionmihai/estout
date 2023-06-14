@@ -1,7 +1,0 @@
-website:
-  sidebar:
-      style: "docked"
-
-format:
-  html:
-    theme: zephyr
