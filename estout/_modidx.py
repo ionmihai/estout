@@ -24,7 +24,5 @@ d = { 'settings': { 'branch': 'main',
                                     'estout.statsmodels.tstats': ('statsmodels.html#tstats', 'estout/statsmodels.py'),
                                     'estout.statsmodels.xnames': ('statsmodels.html#xnames', 'estout/statsmodels.py'),
                                     'estout.statsmodels.ynames': ('statsmodels.html#ynames', 'estout/statsmodels.py')},
-            'estout.utils': { 'estout.utils.extract_stats': ('utils.html#extract_stats', 'estout/utils.py'),
-                              'estout.utils.rgetattr': ('utils.html#rgetattr', 'estout/utils.py'),
-                              'estout.utils.rsetattr': ('utils.html#rsetattr', 'estout/utils.py'),
-                              'estout.utils.stats_translator': ('utils.html#stats_translator', 'estout/utils.py')}}}
+            'estout.utils': { 'estout.utils.rgetattr': ('utils.html#rgetattr', 'estout/utils.py'),
+                              'estout.utils.rsetattr': ('utils.html#rsetattr', 'estout/utils.py')}}}
