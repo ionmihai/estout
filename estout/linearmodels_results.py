@@ -3,33 +3,34 @@
 # %% auto 0
 __all__ = ['ynames', 'xnames', 'params', 'tstats', 'pvalues', 'covmat', 'se', 'nobs', 'r2']
 
-# %% ../nbs/03_linearmodels.ipynb 4
+# %% ../nbs/03_linearmodels.ipynb 3
 import numpy as np
 import pandas as pd
+from linearmodels import PanelOLS
 
-# %% ../nbs/03_linearmodels.ipynb 10
+# %% ../nbs/03_linearmodels.ipynb 9
 def ynames(res): return res.model.dependent.vars 
 
-# %% ../nbs/03_linearmodels.ipynb 12
+# %% ../nbs/03_linearmodels.ipynb 11
 def xnames(res): return res.model.exog.vars
 
-# %% ../nbs/03_linearmodels.ipynb 14
+# %% ../nbs/03_linearmodels.ipynb 13
 def params(res): return res.params
 
-# %% ../nbs/03_linearmodels.ipynb 17
+# %% ../nbs/03_linearmodels.ipynb 16
 def tstats(res): return res.tstats
 
-# %% ../nbs/03_linearmodels.ipynb 19
+# %% ../nbs/03_linearmodels.ipynb 18
 def pvalues(res): return res.pvalues
 
-# %% ../nbs/03_linearmodels.ipynb 21
+# %% ../nbs/03_linearmodels.ipynb 20
 def covmat(res): return res.cov
 
-# %% ../nbs/03_linearmodels.ipynb 23
+# %% ../nbs/03_linearmodels.ipynb 22
 def se(res): return pd.Series(np.sqrt(np.diag(np.array(covmat(res)))),index=xnames(res))
 
-# %% ../nbs/03_linearmodels.ipynb 25
+# %% ../nbs/03_linearmodels.ipynb 24
 def nobs(res): return res.nobs
 
-# %% ../nbs/03_linearmodels.ipynb 27
+# %% ../nbs/03_linearmodels.ipynb 26
 def r2(res): return res.rsquared
