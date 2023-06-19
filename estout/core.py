@@ -7,6 +7,9 @@ __all__ = ['extract_stat']
 import importlib
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
+from linearmodels import PanelOLS
+
 from .utils import *
 
 # %% ../nbs/00_core.ipynb 7
