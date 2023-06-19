@@ -42,4 +42,5 @@ d = { 'settings': { 'branch': 'main',
                               'estout.utils.get_stars': ('utils.html#get_stars', 'estout/utils.py'),
                               'estout.utils.model_groups': ('utils.html#model_groups', 'estout/utils.py'),
                               'estout.utils.rgetattr': ('utils.html#rgetattr', 'estout/utils.py'),
-                              'estout.utils.rsetattr': ('utils.html#rsetattr', 'estout/utils.py')}}}
+                              'estout.utils.rsetattr': ('utils.html#rsetattr', 'estout/utils.py'),
+                              'estout.utils.tex_table_env': ('utils.html#tex_table_env', 'estout/utils.py')}}}
