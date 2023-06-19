@@ -3,6 +3,13 @@
 # %% auto 0
 __all__ = ['extract_stat']
 
-# %% ../nbs/00_core.ipynb 8
+# %% ../nbs/00_core.ipynb 4
+import importlib
+import numpy as np
+import pandas as pd
+from .utils import *
+
+# %% ../nbs/00_core.ipynb 7
 def extract_stat(res, package: str=None, stat: str=None): 
-    return estout.utils.rgetattr(estout,package+'.'+stat)(res)
+    results_package = importlib.import_module(f"estout.{package}_results")
+    return rgetattr(results_package,stat)(res)
