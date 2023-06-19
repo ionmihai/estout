@@ -5,7 +5,7 @@ __all__ = ['rgetattr', 'rsetattr', 'default_formats', 'formats', 'get_stars', 'm
 
 # %% ../nbs/01_utils.ipynb 4
 import functools
-from typing import Dict, List 
+from typing import Dict, List, Tuple 
 import pandas as pd 
 import numpy as np
 
@@ -94,7 +94,7 @@ def model_groups(column_group_names: Dict[str, List[int]], # keys are group titl
 # %% ../nbs/01_utils.ipynb 22
 def tex_table_env(nr_columns: int, # number of columns in the table
                     env: str='tabularx' # latex tabular environment specification. either 'tabularx' or 'tabular*'
-                    ) -> (str,str):
+                    ) -> Tuple[str,str]:
     """Creates LaTex code to add at the top of the table to create the correct tabular environment."""
 
     if env=='tabularx':
