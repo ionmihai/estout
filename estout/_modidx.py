@@ -5,4 +5,6 @@ d = { 'settings': { 'branch': 'main',
                 'doc_host': 'https://ionmihai.github.io',
                 'git_url': 'https://github.com/ionmihai/estout',
                 'lib_path': 'estout'},
-  'syms': {'estout.core': {'estout.core.foo': ('core.html#foo', 'estout/core.py')}}}
+  'syms': { 'estout.core': {'estout.core.foo': ('core.html#foo', 'estout/core.py')},
+            'estout.utils': { 'estout.utils.rgetattr': ('utils.html#rgetattr', 'estout/utils.py'),
+                              'estout.utils.rsetattr': ('utils.html#rsetattr', 'estout/utils.py')}}}
