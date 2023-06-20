@@ -4,6 +4,7 @@
 __all__ = ['extract_stat', 'model_results', 'to_df', 'to_tex']
 
 # %% ../nbs/00_core.ipynb 3
+#| echo: true
 import importlib
 import numpy as np
 import pandas as pd
