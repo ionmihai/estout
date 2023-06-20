@@ -65,7 +65,9 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
         newcol = newcol.stack(level=0) #set_index('coeff_names')
         columns.append(newcol)
 
-    out = pd.concat(columns, axis = 1).loc[which_xvars].copy()
+    out = pd.concat(columns, axis = 1)
+    if which_xvars is None: out = out.loc[which_xvars].copy()
+    
     for i,res in enumerate(res_list):
         for x in stats_bottom:
             out.loc[x,i] = formats[x].format(res[x]) if x in formats else res[x]
