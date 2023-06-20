@@ -4,6 +4,7 @@
 __all__ = ['collect_stats', 'to_df', 'to_tex']
 
 # %% ../nbs/00_core.ipynb 3
+from typing import List, Dict, Tuple
 import importlib
 import numpy as np
 import pandas as pd
@@ -40,16 +41,23 @@ def collect_stats(res, # results object to extract stats from
     return out
 
 # %% ../nbs/00_core.ipynb 12
-def to_df(res_list,
+def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
           which_xvars: list=None, # if None, report all xvars
-          stats_body: list=['params', 'tstats'],
-          stats_bottom: list=['r2', 'nobs'],
+          stats_body: list=['params', 'tstats'], # each element of 'res_list' needs to have these stats as keys; values must be pd.Series
+          stats_bottom: list=['r2', 'nobs'], # each element of 'res_list' needs to have these stats as keys; values must be scalars
           labels: dict=None 
           ) -> pd.DataFrame: 
+    """Combines results from multiple `collect_stats()` outputs into a single pd.DataFrame"""  
     
+    allstats = stats_body + stats_bottom
+    ncols = len(res_list)
+    dct = {}
+    for stat in stats_body:
+        dct[stat] = pd.concat([res[stat] for res in res_list], axis=1)
+        dct[stat].index = stat + '_' + dct[stat].index
 
-    return 
+    return dct
 
-# %% ../nbs/00_core.ipynb 14
+# %% ../nbs/00_core.ipynb 15
 def to_tex(get_pdf=True, open_pdf=False):
     pass
