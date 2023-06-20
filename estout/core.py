@@ -50,11 +50,9 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
           ) -> pd.DataFrame: 
     """Combines results from multiple `collect_stats()` outputs into a single pd.DataFrame"""  
     
-    allstats = stats_body + stats_bottom
-    ncols = len(res_list)
     formats = default_formats()
     if add_formats is not None: formats.update(add_formats)
-
+    
     columns = []
     for i,res in enumerate(res_list):
         newcol = pd.concat([res[x] for x in stats_body], axis=1, ignore_index=True).set_axis(stats_body, axis=1)
@@ -64,14 +62,20 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
                 newcol[x] += get_stars(res['pvalues'])
             else:
                 newcol[x] = '(' + newcol[x] + ')'
-        newcol = newcol.transpose().melt(var_name='coeff_names', value_name=f'({i+1})').set_index('coeff_names').loc[which_xvars].copy()
-        for x in stats_bottom:
-            newcol.loc[x,f'({i+1})'] = formats[x].format(res[x]) if x in formats else res[x]
-
+        newcol = newcol.stack(level=0) #set_index('coeff_names')
         columns.append(newcol)
 
-    return pd.concat(columns, axis = 1)
+    out = pd.concat(columns, axis = 1).loc[which_xvars].copy()
+    for i,res in enumerate(res_list):
+        for x in stats_bottom:
+            out.loc[x,i] = formats[x].format(res[x]) if x in formats else res[x]
 
-# %% ../nbs/00_core.ipynb 15
+    if labels is not None:
+        for var in set(out.droplevel(1).index):
+            if var in labels: out = out.rename(index={var:labels[var]}, level=0)            
+
+    return out.astype('string').fillna('')
+
+# %% ../nbs/00_core.ipynb 14
 def to_tex(get_pdf=True, open_pdf=False):
     pass
