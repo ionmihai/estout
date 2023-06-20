@@ -55,17 +55,20 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
     formats = default_formats()
     if add_formats is not None: formats.update(add_formats)
 
-    #Format outputs
-    #for res in res_list:
-    #    for stat in stats_body:
-    #    res[stat] = res[stat].map(formats[stat].format)
-    #    for stat in stats_bottom:
-    #        if stat in formats: formatted_results[stat] = formats[stat].format(res[stat])
-
     columns = []
-    for res in res_list:
-        newcol = pd.concat([res[x] for x in stats_body], axis=1).transpose().melt()
-        columns.append(newcol.set_index('variable'))
+    for i,res in enumerate(res_list):
+        newcol = pd.concat([res[x] for x in stats_body], axis=1, ignore_index=True).set_axis(stats_body, axis=1)
+        for x in stats_body:
+            newcol[x] = newcol[x].map(formats[x].format)
+            if x == 'params':
+                newcol[x] += get_stars(res['pvalues'])
+            else:
+                newcol[x] = '(' + newcol[x] + ')'
+        newcol = newcol.transpose().melt(var_name='coeff_names', value_name=f'({i+1})').set_index('coeff_names').loc[which_xvars].copy()
+        for x in stats_bottom:
+            newcol.loc[x,f'({i+1})'] = formats[x].format(res[x]) if x in formats else res[x]
+
+        columns.append(newcol)
 
     return pd.concat(columns, axis = 1)
 

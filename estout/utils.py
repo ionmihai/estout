@@ -30,8 +30,8 @@ def default_formats(
             'tstats':'{:.2f}', 
             'pvalues': '{:.3f}',
             'se':'{:.2f}', 
-            'R2':'{:.3f}',
-            'N':'{:.0f}'
+            'r2':'{:.3f}',
+            'nobs':'{:.0f}'
             }
 
 # %% ../nbs/01_utils.ipynb 9
