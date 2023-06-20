@@ -17,7 +17,8 @@ from .utils import *
 def collect_stats(res, # results object to extract stats from
                   package: str=None, # name of package that generated 'res' object
                   get_default_stats = True, # if True, returns all stats implemented by the f'{package}_results' module
-                  add_stats: dict=None # keys are stats to extract in addition to the default ones, values are attributes of 'res'
+                  add_stats: dict=None, # keys are stats to extract in addition to the default ones, values are attributes of 'res'
+                  add_literals: dict=None, # additional info to be added to output dict as literal strings
                   ) -> dict:
     """Collects stats from 'res' object. stats in 'add_stats' can override defaults."""
 
@@ -31,15 +32,19 @@ def collect_stats(res, # results object to extract stats from
     if add_stats is not None:
         for stat, attr in add_stats.items():
             out[stat] = rgetattr(res, attr)
+
+    if add_literals is not None:
+        out.update(add_literals)
+        
     return out
 
-# %% ../nbs/00_core.ipynb 11
+# %% ../nbs/00_core.ipynb 12
 def to_df(res_list,
           which_xvars
           ) -> pd.DataFrame: 
     pass
 #like tabulate function
 
-# %% ../nbs/00_core.ipynb 13
+# %% ../nbs/00_core.ipynb 14
 def to_tex(get_pdf=True, open_pdf=False):
     pass
