@@ -3,7 +3,7 @@ project:
 
 format:
   html:
-    theme: cosmo
+    theme: zephyr
     css: styles.css
     toc: true
 
@@ -15,6 +15,6 @@ website:
     background: primary
     search: true
   sidebar:
-    style: floating
+    style: docked
 
 metadata-files: [nbdev.yml, sidebar.yml]

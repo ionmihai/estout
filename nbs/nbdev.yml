@@ -4,6 +4,6 @@ project:
 website:
   title: "estout"
   site-url: "https://ionmihai.github.io/estout"
-  description: "Collect stats results and export them to LaTex and pdf"
+  description: "Collect regression results and export them to LaTex and pdf"
   repo-branch: main
   repo-url: "https://github.com/ionmihai/estout"
