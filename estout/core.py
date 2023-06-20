@@ -45,18 +45,29 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
           which_xvars: list=None, # if None, report all xvars
           stats_body: list=['params', 'tstats'], # each element of 'res_list' needs to have these stats as keys; values must be pd.Series
           stats_bottom: list=['r2', 'nobs'], # each element of 'res_list' needs to have these stats as keys; values must be scalars
-          labels: dict=None 
+          labels: dict=None,
+          add_formats: dict=None  
           ) -> pd.DataFrame: 
     """Combines results from multiple `collect_stats()` outputs into a single pd.DataFrame"""  
     
     allstats = stats_body + stats_bottom
     ncols = len(res_list)
-    dct = {}
-    for stat in stats_body:
-        dct[stat] = pd.concat([res[stat] for res in res_list], axis=1)
-        dct[stat].index = stat + '_' + dct[stat].index
+    formats = default_formats()
+    if add_formats is not None: formats.update(add_formats)
 
-    return dct
+    #Format outputs
+    #for res in res_list:
+    #    for stat in stats_body:
+    #    res[stat] = res[stat].map(formats[stat].format)
+    #    for stat in stats_bottom:
+    #        if stat in formats: formatted_results[stat] = formats[stat].format(res[stat])
+
+    columns = []
+    for res in res_list:
+        newcol = pd.concat([res[x] for x in stats_body], axis=1).transpose().melt()
+        columns.append(newcol.set_index('variable'))
+
+    return pd.concat(columns, axis = 1)
 
 # %% ../nbs/00_core.ipynb 15
 def to_tex(get_pdf=True, open_pdf=False):

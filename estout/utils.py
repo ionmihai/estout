@@ -51,24 +51,27 @@ def formats(digits: dict=None, # keys are parameter names, values are integers s
 
 
 # %% ../nbs/01_utils.ipynb 15
-def get_stars(pvalue: float, # this is compared to key of 'stars' parameter to determine how many stars should be added
+def get_stars(pvalues: pd.Series, # this is compared to key of 'stars' parameter to determine how many stars should be added
             stars: dict = {.1:'*',.05:'**',.01:'***'} # todo: default values to the left are star symbols that are not rendered correctly in markdown
-            ) -> str:
-    """Returns string with the appropriate number of stars given the 'pvalue'"""
+            ) -> pd.Series:
+    """For each pvalue, check the lowest key in 'stars' for which the pvalue is smaller than that key, and return the corresponding nr of stars."""
+
+    param_names = list(pvalues.index)
 
     #Sort 'stars' by key (in reverse order)
     ks = list(stars.keys())
     ks.sort(reverse=True)
     stars = {k: stars[k] for k in ks}
-    
-    stars_string = ''
-    for alpha in stars:
-        if pvalue < alpha:
-            stars_string = stars[alpha]
-            
-    return stars_string
 
-# %% ../nbs/01_utils.ipynb 20
+    out = pd.Series('', index=param_names)
+    for param in param_names:    
+        for alpha in stars:
+            if pvalues[param] < alpha:
+                out[param] = stars[alpha]
+                
+    return out
+
+# %% ../nbs/01_utils.ipynb 18
 def model_groups(column_group_names: Dict[str, List[int]], # keys are group titles, values are lists of column indices included in each group
                 add_clines: bool=True # if True, adds lines below group names
                 ) -> str:
@@ -91,7 +94,7 @@ def model_groups(column_group_names: Dict[str, List[int]], # keys are group titl
 
     return group_names + ' \\\\ \n' + group_lines + ' \n'
 
-# %% ../nbs/01_utils.ipynb 22
+# %% ../nbs/01_utils.ipynb 20
 def tex_table_env(nr_columns: int, # number of columns in the table
                     env: str='tabularx' # latex tabular environment specification. either 'tabularx' or 'tabular*'
                     ) -> Tuple[str,str]:
