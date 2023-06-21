@@ -5,7 +5,6 @@ __all__ = ['collect_stats', 'to_df', 'to_tex']
 
 # %% ../nbs/00_core.ipynb 4
 from typing import List
-from pprint import pprint
 import importlib
 import numpy as np
 import pandas as pd
