@@ -64,7 +64,7 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
         columns.append(newcol)
 
     out = pd.concat(columns, axis = 1)
-    if which_xvars is None: out = out.loc[which_xvars].copy()
+    if which_xvars is not None: out = out.loc[which_xvars].copy()
     
     for i,res in enumerate(res_list):
         for x in stats_bottom:
