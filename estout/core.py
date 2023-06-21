@@ -18,7 +18,7 @@ from .utils import *
 def collect_stats(res, # results object to extract stats from
                   package: str=None, # name of package that generated 'res' object
                   get_default_stats = True, # if True, returns all stats implemented by the f'{package}_results' module
-                  add_stats: dict=None, # keys are stats to extract in addition to the default ones, values are attributes of 'res'
+                  add_stats: dict=None, # keys are stats to extract in addition to the default ones; values are attributes of 'res'
                   add_literals: dict=None, # additional info to be added to output dict as literal strings
                   ) -> dict:
     """Collects stats from 'res' object. stats in 'add_stats' can override default stats()"""
@@ -31,7 +31,7 @@ def collect_stats(res, # results object to extract stats from
     results_module = importlib.import_module(f"estout.{package}_results")
 
     if get_default_stats:
-        for stat in results_module.default_stats():
+        for stat in results_module.__all__:
             out[stat] = rgetattr(results_module, stat)(res)
 
     if add_stats is not None:
