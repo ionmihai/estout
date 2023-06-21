@@ -13,10 +13,77 @@ pip install estout
 
 ## How to use
 
-Fill me in please! Don’t forget code examples:
+Set up an example dataset and run a few regressions to showcase the
+functions in this module.
 
 ``` python
-1+1
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+from linearmodels import PanelOLS
+import estout
 ```
 
-    2
+``` python
+np.random.seed(123)
+df = pd.DataFrame(np.random.rand(9,3), 
+                  columns=['y','x','z'],
+                  index = pd.MultiIndex.from_product([[1,2,3],[1,2,3]], names=['firmid','time'])
+                  ).assign(cons = 1)
+sm1 = sm.OLS(df['y'], df[['cons','x']]).fit()
+sm2 = sm.OLS(df['y'], df[['cons','x','z']]).fit().get_robustcov_results(cov_type='HAC', maxlags=2)
+lmres = PanelOLS(df['y'],  df[['cons','x','z']], entity_effects=True
+                 ).fit(cov_type='clustered', cluster_entity=True)
+```
+
+### Extracting statistics after fitting a model
+
+Collect just the default set of statistics from the `sm1` object:
+
+``` python
+estout.collect_stats(sm1)
+```
+
+    {'package': 'statsmodels',
+     'ynames': ['y'],
+     'xnames': ['cons', 'x'],
+     'params': cons    0.507852
+     x       0.345003
+     dtype: float64,
+     'tstats': cons    3.905440
+     x       1.292246
+     dtype: float64,
+     'pvalues': cons    0.005858
+     x       0.237293
+     dtype: float64,
+     'covmat':           cons         x
+     cons  0.016910 -0.030531
+     x    -0.030531  0.071278,
+     'se': cons    0.130037
+     x       0.266979
+     dtype: float64,
+     'r2': 0.19260886185799486,
+     'nobs': 9}
+
+Collect statistics by specifying the name of their attribute in the
+results object:
+
+``` python
+estout.collect_stats(sm1, get_default_stats=False, add_stats={'xnames': 'model.exog_names',
+                                                              'Adj. R2': 'rsquared_adj'})
+```
+
+    {'package': 'statsmodels',
+     'xnames': ['cons', 'x'],
+     'Adj. R2': 0.07726727069485129}
+
+Add scalar statistics not available as attributes of the results object:
+
+``` python
+estout.collect_stats(sm1, get_default_stats=False, add_literals={'Fixed Effects': 'No', 
+                                                                 'Nr observations': 123})
+```
+
+    {'package': 'statsmodels', 'Fixed Effects': 'No', 'Nr observations': 123}
+
+### Combining model results into a DataFrame

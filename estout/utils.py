@@ -7,7 +7,6 @@ __all__ = ['rgetattr', 'rsetattr', 'default_formats', 'get_stars', 'model_groups
 import functools
 from typing import Dict, List, Tuple 
 import pandas as pd 
-import numpy as np
 
 # %% ../nbs/01_utils.ipynb 5
 def rgetattr(obj, attr, *args):

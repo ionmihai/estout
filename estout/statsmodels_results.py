@@ -7,50 +7,50 @@ __all__ = ['default_stats', 'ynames', 'xnames', 'params', 'tstats', 'pvalues', '
 import numpy as np
 import pandas as pd
 
-# %% ../nbs/02_statsmodels.ipynb 5
+# %% ../nbs/02_statsmodels.ipynb 7
 def default_stats():
     """List of statistics calculated in this module"""
     return ['ynames', 'xnames', 'params', 'tstats', 'pvalues', 'covmat', 'se', 'r2', 'nobs']
 
-# %% ../nbs/02_statsmodels.ipynb 13
+# %% ../nbs/02_statsmodels.ipynb 11
 def ynames(res): return list(res.model.endog_names)
 
-# %% ../nbs/02_statsmodels.ipynb 15
+# %% ../nbs/02_statsmodels.ipynb 13
 def xnames(res): return res.model.exog_names
 
-# %% ../nbs/02_statsmodels.ipynb 17
+# %% ../nbs/02_statsmodels.ipynb 15
 def params(res): 
     if isinstance(res.params, np.ndarray):
             return pd.Series(res.params, index=xnames(res)) 
     else:
         return res.params
 
-# %% ../nbs/02_statsmodels.ipynb 20
+# %% ../nbs/02_statsmodels.ipynb 18
 def tstats(res):
     if isinstance(res.tvalues, np.ndarray):
             return pd.Series(res.tvalues, index=xnames(res)) 
     else:
         return res.tvalues
 
-# %% ../nbs/02_statsmodels.ipynb 23
+# %% ../nbs/02_statsmodels.ipynb 21
 def pvalues(res):
     if isinstance(res.pvalues, np.ndarray):
             return pd.Series(res.pvalues, index=xnames(res)) 
     else:
         return res.pvalues
 
-# %% ../nbs/02_statsmodels.ipynb 26
+# %% ../nbs/02_statsmodels.ipynb 24
 def covmat(res):
     if isinstance(res.cov_params(), np.ndarray):
             return pd.DataFrame(res.cov_params(), index=xnames(res), columns=xnames(res)) 
     else:
         return res.cov_params()
 
-# %% ../nbs/02_statsmodels.ipynb 29
+# %% ../nbs/02_statsmodels.ipynb 27
 def se(res): return pd.Series(np.sqrt(np.diag(np.array(covmat(res)))),index=xnames(res))
 
-# %% ../nbs/02_statsmodels.ipynb 32
+# %% ../nbs/02_statsmodels.ipynb 30
 def nobs(res): return int(res.nobs)
 
-# %% ../nbs/02_statsmodels.ipynb 34
+# %% ../nbs/02_statsmodels.ipynb 32
 def r2(res): return res.rsquared
