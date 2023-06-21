@@ -3,8 +3,9 @@
 # %% auto 0
 __all__ = ['collect_stats', 'to_df', 'to_tex']
 
-# %% ../nbs/00_core.ipynb 3
+# %% ../nbs/00_core.ipynb 4
 from typing import List
+from pprint import pprint
 import importlib
 import numpy as np
 import pandas as pd
@@ -14,7 +15,7 @@ from linearmodels import PanelOLS
 
 from .utils import *
 
-# %% ../nbs/00_core.ipynb 7
+# %% ../nbs/00_core.ipynb 8
 def collect_stats(res, # results object to extract stats from
                   package: str, # name of package that generated 'res' object
                   get_default_stats = True, # if True, returns all stats implemented by the f'{package}_results' module
@@ -40,7 +41,7 @@ def collect_stats(res, # results object to extract stats from
         
     return out
 
-# %% ../nbs/00_core.ipynb 13
+# %% ../nbs/00_core.ipynb 14
 def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
           which_xvars: list=None, # if None, report all xvars
           stats_body: list=['params', 'tstats'], # each element of 'res_list' needs to have these stats as keys; values must be pd.Series
@@ -78,6 +79,6 @@ def to_df(res_list: List[dict], # list of outputs from `collect_stats()`
 
     return out.astype('string').fillna('')
 
-# %% ../nbs/00_core.ipynb 15
+# %% ../nbs/00_core.ipynb 16
 def to_tex(get_pdf=True, open_pdf=False):
     pass
