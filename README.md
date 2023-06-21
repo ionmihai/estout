@@ -22,7 +22,6 @@ import pandas as pd
 import statsmodels.api as sm
 from linearmodels import PanelOLS
 import estout
-from IPython.display import display
 ```
 
 ``` python
@@ -102,12 +101,21 @@ for res in [sm1, sm2, lmres]:
 ```
 
 ``` python
-a = estout.to_df(allmodels)
-a
+estout.to_df(allmodels)
 ```
 
 <div>
-
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 
 |      |        | 0          | 1          | 2          |
 |------|--------|------------|------------|------------|
