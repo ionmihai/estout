@@ -7,7 +7,7 @@ import os
 import platform
 from subprocess import PIPE, Popen, run, SubprocessError
 import functools
-from typing import Dict, List, Tuple 
+from typing import Dict, List, Tuple, Literal 
 import pandas as pd 
 
 # %% auto 0
@@ -84,7 +84,7 @@ def model_groups(column_group_names: Dict[str, List[int]], # Keys are group titl
 
 # %% ../nbs/01_utils.ipynb 13
 def tex_table_env(nr_columns: int, # Number of columns in the table
-                    env: str='tabularx' # Latex tabular environment specification. either 'tabularx' or 'tabular*'
+                    env: Literal['tabularx','tabular*']='tabular*' # Latex tabular environment specification
                     ) -> Tuple[str,str]:
     """Creates LaTex code to add at the top of the table to create the correct tabular environment."""
 
