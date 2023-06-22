@@ -11,8 +11,8 @@ from typing import Dict, List, Tuple, Literal
 import pandas as pd 
 
 # %% auto 0
-__all__ = ['rgetattr', 'rsetattr', 'default_formats', 'get_stars', 'model_groups', 'tex_table_env', 'make_pdf_from_tex',
-           'open_pdf_file']
+__all__ = ['rgetattr', 'rsetattr', 'default_formats', 'get_stars', 'model_groups', 'tex_table_env', 'df_to_tex',
+           'make_pdf_from_tex', 'open_pdf_file']
 
 # %% ../nbs/01_utils.ipynb 4
 def rgetattr(obj, attr, *args):
@@ -99,6 +99,39 @@ def tex_table_env(nr_columns: int, # Number of columns in the table
     return header,footer 
 
 # %% ../nbs/01_utils.ipynb 16
+def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level is kept
+                panel_title: str='',
+                palign: Literal['l','r','c']='l', # Alignment of panel title 
+                col_groups: Dict[str, List[int]]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
+                col_names: List[str]|bool=True, # If False, none; if True, use df column names; if list, gives custom column names
+                hlines: List[int]=[], # Row indices under which to place hline
+                tabular_env: str='tabular*' #LaTex tabular environment
+                ) -> str: 
+    """Creates LaTeX-formatted table from DataFrame."""
+
+    nr_cols = len(df.columns)
+    if isinstance(df.index, pd.MultiIndex): df = df.droplevel(1)
+
+    header,footer = tex_table_env(nr_cols, tabular_env)
+    out = header + ' \n'
+
+    if panel_title:
+        out += f'\multicolumn{{{nr_cols+1}}}{{@{{}} {palign}}}{{{panel_title}}}' + ' \\\\ \n'
+
+    if col_groups: out += model_groups(col_groups)
+    if col_names is True: col_names = [str(x) for x in df.columns]
+    if col_names: out += ' & '.join([''] + col_names) + ' \\\\ \n'
+    for rownr in range(df.shape[0]):
+        out += str(df.index[rownr]) + ' & '  + ' & '.join(list(df.iloc[rownr])) +  ' \\\\ \n' 
+    out = out + footer
+
+    linebreaks = [i for i in range(len(out)) if out[i:].startswith('\n')]
+    for line_nr, pos in reversed(list(enumerate(linebreaks))):
+        if line_nr in hlines: out = out[:pos+1] + ' \hline \\noalign{\smallskip} \n' + out[pos+1:]
+
+    return out
+
+# %% ../nbs/01_utils.ipynb 18
 def make_pdf_from_tex(tex_file_path: Path|str) -> Path:
     """Output PDF is created in the same folder as source tex file. Requires TexLive and its pdflatex utility"""
 
@@ -110,7 +143,7 @@ def make_pdf_from_tex(tex_file_path: Path|str) -> Path:
     else: print("PDF creation failed. Errors:", errors.decode('utf-8'))
     return Path(str.replace(str(tex_file_path), '.tex', '.pdf'))
 
-# %% ../nbs/01_utils.ipynb 17
+# %% ../nbs/01_utils.ipynb 19
 def open_pdf_file(file_path):
     try:
         if platform.system() == "Windows": run(['start', file_path])

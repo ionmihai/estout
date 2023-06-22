@@ -14,7 +14,7 @@ from linearmodels import PanelOLS
 from .utils import *
 
 # %% auto 0
-__all__ = ['collect_stats', 'to_df', 'df_to_tex', 'to_tex']
+__all__ = ['collect_stats', 'to_df', 'to_tex']
 
 # %% ../nbs/00_core.ipynb 7
 def collect_stats(res, # Results object to extract stats from
@@ -84,48 +84,15 @@ def to_df(res_list: List[dict], # List of outputs from `collect_stats()`
 
     return out.astype('string').fillna('')
 
-# %% ../nbs/00_core.ipynb 15
-def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level is kept
-                panel_title: str='',
-                palign: Literal['l','r','c']='l', # Alignment of panel title 
-                col_groups: Dict[str, List[int]]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
-                col_names: List[str]|bool=True, # If False, none; if True, use df column names; if list, gives custom column names
-                hlines: List[int]=[], # Row indices under which to place hline
-                tabular_env: str='tabular*' #LaTex tabular environment
-                ) -> str: 
-    """Creates LaTeX-formatted table from DataFrame."""
-
-    nr_cols = len(df.columns)
-    if isinstance(df.index, pd.MultiIndex): df = df.droplevel(1)
-
-    header,footer = tex_table_env(nr_cols, tabular_env)
-    out = header + '\n'
-
-    if panel_title:
-        out += '\\rule{0pt}{3ex} ' + f'\multicolumn{{{nr_cols+1}}}{{@{{}} {palign}}}{{{panel_title}}}' + ' \\\\ \n'
-
-    if col_groups: out += model_groups(col_groups)
-    if col_names is True: col_names = [str(x) for x in df.columns]
-    if col_names: out += ' & '.join([''] + col_names) + ' \\\\ \n'
-    for rownr in range(df.shape[0]):
-        out += str(df.index[rownr]) + ' & '  + ' & '.join(list(df.iloc[rownr])) +  ' \\\\ \n' 
-    out = out + footer
-
-    linebreaks = [i for i in range(len(out)) if out[i:].startswith('\n')]
-    for line_nr, pos in reversed(list(enumerate(linebreaks))):
-        if line_nr in hlines: out = out[:pos+1] + ' \hline \n' + out[pos+1:]
-
-    return out
-
-# %% ../nbs/00_core.ipynb 18
-def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # (List of) outputs from estout.to_df()
+# %% ../nbs/00_core.ipynb 16
+def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # DataFrame(s) to be converted to tex table; if multiple, they will be panels in a larger table
             outfile: Path|str=None, # Where to save resulting tex output
             title: str='Table title', # Table title
             notes: str='Table description', # Some call this the table caption
             notes_on_top: bool=True, # Set to False if you want table description (caption) to be at the bottom
             label: str='', # Table label (for referencing within LaTex document)
             table_type: Literal['table','sidewaystable']='table',
-            font_size: str='\scriptsize', # Gets applied to the table contents as well as its caption
+            font_size: str='\\footnotesize', # Gets applied to the table contents as well as its caption
             addtocounter: int=0, # Set to -1 for tables that are just a continuation of a table on a new page
             
             panel_title: List[str]=None, # One element in the list for each dataframe in 'dfs'
@@ -134,16 +101,17 @@ def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # (List of) outputs from estout
             col_names: List[Union[list,bool]]=True, # If False, none; if True, use df column names; if list, gives custom column names
             hlines: List[List[int]]=None, # Row indices under which to place hline
             tabular_env: str='tabular*' #LaTex tabular environment
-            ):
+            ) -> str:
+    """Create tex code to generate table from one or more dataframes"""
 
     if isinstance(dfs, pd.DataFrame): dfs = [dfs]
     if panel_title is None: panel_title = ['']*len(dfs)
     if col_groups is None: col_groups = [None]*len(dfs)
     if col_names in [True, False]: col_names = [col_names]*len(dfs)
     if hlines is None: hlines = [[]]*len(dfs)
-    body = '\n'.join([df_to_tex(dfs[i], panel_title=panel_title[i], palign=palign, tabular_env=tabular_env,
-                                col_groups=col_groups[i], col_names=col_names[i], hlines=hlines[i]) 
-                      for i in range(len(dfs))])
+    body =  '\n \smallskip \n'.join([df_to_tex(dfs[i], panel_title=panel_title[i], palign=palign, tabular_env=tabular_env,
+                                            col_groups=col_groups[i], col_names=col_names[i], hlines=hlines[i]) 
+                            for i in range(len(dfs))])
     
     pre = "\\newpage \n \\clearpage \n "
     pre += f"\\begin{{{table_type}}}[!h] {font_size} \n"
@@ -156,9 +124,9 @@ def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # (List of) outputs from estout
     if addtocounter==0: notes_tex = f"\\par {{{notes}}}"
 
     if notes_on_top:
-        mid = notes_tex + f" \n\n \\vspace{{{'1mm'}}} \n\n {body} \n"
+        mid = notes_tex + f" \n\n \\vspace{{{'2mm'}}} \n\n {body} \n"
     else:
-        mid = f"{body} \n\n \\vspace{{{'1mm'}}} \n\n " + notes_tex + ' \n'
+        mid = f"{body} \n\n \\vspace{{{'2mm'}}} \n\n " + notes_tex + ' \n'
 
     content = pre + mid + post
 
