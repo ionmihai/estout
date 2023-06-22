@@ -99,16 +99,15 @@ def tex_table_env(nr_columns: int, # number of columns in the table
     return header,footer 
 
 # %% ../nbs/01_utils.ipynb 16
-def make_pdf_from_tex(tex_file_path: Path|str):
-    if isinstance(tex_file_path,str):
-        tex_file_path = Path(tex_file_path)
+def make_pdf_from_tex(tex_file_path: Path|str) -> Path:
+    """Output PDF is created in the same folder as source tex file. Requires TexLive and its pdflatex utility"""
+
+    if isinstance(tex_file_path,str): tex_file_path = Path(tex_file_path)
     os.chdir(tex_file_path.parent)   
     process = Popen(['pdflatex',tex_file_path], stdin=PIPE, stdout=PIPE, stderr=PIPE,shell=False)
-    output, errors = process.communicate()
-    if process.returncode == 0:
-        print("PDF creation successful!")
-    else:
-        print("PDF creation failed. Errors:", errors.decode('utf-8'))
+    _ , errors = process.communicate()
+    if process.returncode == 0: print("PDF creation successful!")
+    else: print("PDF creation failed. Errors:", errors.decode('utf-8'))
     return Path(str.replace(str(tex_file_path), '.tex', '.pdf'))
 
 # %% ../nbs/01_utils.ipynb 17
