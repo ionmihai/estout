@@ -39,8 +39,8 @@ def default_formats() -> dict:
             }
 
 # %% ../nbs/01_utils.ipynb 8
-def get_stars(pvalues: pd.Series, # this is compared to key of 'stars' parameter to determine how many stars should be added
-            stars: dict = {.1:'*',.05:'**',.01:'***'} # todo: default values to the left are star symbols that are not rendered correctly in markdown
+def get_stars(pvalues: pd.Series, # This is compared to key of 'stars' parameter to determine how many stars should be added
+            stars: dict = {.1:'*',.05:'**',.01:'***'} # Todo: default values to the left are star symbols that are not rendered correctly in markdown
             ) -> pd.Series:
     """For each pvalue, check the lowest key in 'stars' for which the pvalue is smaller than that key, and return the corresponding nr of stars."""
 
@@ -60,8 +60,8 @@ def get_stars(pvalues: pd.Series, # this is compared to key of 'stars' parameter
     return out
 
 # %% ../nbs/01_utils.ipynb 11
-def model_groups(column_group_names: Dict[str, List[int]], # keys are group titles, values are lists of column indices included in each group
-                add_clines: bool=True # if True, adds lines below group names
+def model_groups(column_group_names: Dict[str, List[int]], # Keys are group titles, values are lists of column indices included in each group
+                add_clines: bool=True # If True, adds lines below group names
                 ) -> str:
     """Returns LaTex code needed to add at the top of the table in order to give names to groups of columns in the table."""
     
@@ -83,8 +83,8 @@ def model_groups(column_group_names: Dict[str, List[int]], # keys are group titl
     return group_names + ' \\\\ \n' + group_lines + ' \n'
 
 # %% ../nbs/01_utils.ipynb 13
-def tex_table_env(nr_columns: int, # number of columns in the table
-                    env: str='tabularx' # latex tabular environment specification. either 'tabularx' or 'tabular*'
+def tex_table_env(nr_columns: int, # Number of columns in the table
+                    env: str='tabularx' # Latex tabular environment specification. either 'tabularx' or 'tabular*'
                     ) -> Tuple[str,str]:
     """Creates LaTex code to add at the top of the table to create the correct tabular environment."""
 
