@@ -14,7 +14,7 @@ from linearmodels import PanelOLS
 from .utils import *
 
 # %% auto 0
-__all__ = ['collect_stats', 'to_df', 'to_tex']
+__all__ = ['collect_stats', 'to_df', 'df_to_tex', 'combine_panels', 'to_tex']
 
 # %% ../nbs/00_core.ipynb 7
 def collect_stats(res, # Results object to extract stats from
@@ -84,7 +84,73 @@ def to_df(res_list: List[dict], # List of outputs from `collect_stats()`
 
     return out.astype('string').fillna('')
 
+# %% ../nbs/00_core.ipynb 16
+def df_to_tex(df: pd.DataFrame, # Output from estout.to_df()
+                column_group_names: Dict[str, List[int]]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
+                column_names: List[str]|bool=True, # If False, none; if True, use df column names; if list, gives custom column names
+                hlines: List[int]=[] # Row indices under which to place hline
+                ) -> str: 
+    """Creates LaTeX-formatted table from DataFrame."""
+
+    df = df.droplevel(1)
+
+    line_counter = 0
+    out = ''
+    if 0 in hlines: out += ' \hline \n'
+
+    if column_group_names:
+        out += model_groups(column_group_names)
+        line_counter += 1
+        if 1 in hlines: out += ' \hline \n'
+
+    if column_names is True:
+        column_names = [str(x) for x in df.columns]
+
+    if column_names:
+        out += ' & '.join([''] + column_names) + ' \\\\ \n'
+        line_counter += 1
+        if line_counter in hlines: out += ' \hline \n'
+
+    for rownr in range(df.shape[0]):
+        out += str(df.index[rownr]) + ' & '  + ' & '.join(list(df.iloc[rownr])) +  ' \\\\ \n' 
+        line_counter += 1
+        if line_counter in hlines: out += ' \hline \n'
+
+    return out
+
 # %% ../nbs/00_core.ipynb 19
+def combine_panels(panels: Dict[str,str], # Keys are panel titles, values are outputs of df_to_tex()
+                    nr_columns: List[int], # Number of columns in each panel. 
+                    ptitles_over_columns: bool=True,
+                    panel_alignment: str='c',
+                    space_bw_panels: str='\\rule{0pt}{3ex}',
+                    hlines_under_ptitles: bool=True,
+                    tex_tabular_env: str='tabularx',
+                    ) -> str:
+    """keys of 'panels' dict are panels titles, values are outputs from 'to_latex()'"""
+    
+    nr_columns = max(nr_columns)
+    header,footer = tex_table_env(nr_columns, tex_tabular_env)
+    out = header + ' \n  \hline \n'
+
+    for ptitle, ptext in panels.items():
+        if ptitle!='':
+            if ptitles_over_columns:
+                out += space_bw_panels \
+                        + f' & \multicolumn{{{nr_columns}}}{{{panel_alignment}}}{{{ptitle}}}' \
+                        + ' \\\\ \n'
+            else:
+                out += space_bw_panels \
+                        + f'\multicolumn{{{nr_columns+1}}}{{@{{}} {panel_alignment}}}{{{ptitle}}}' \
+                        + ' \\\\ \n'
+
+            if hlines_under_ptitles: out += ' \hline \n'
+        out += ptext + '  \n'
+    
+    out += footer + '\n'
+    return out
+
+# %% ../nbs/00_core.ipynb 21
 def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # (List of) outputs from estout.to_df()
             outfile: Path|str=None, # Where to save resulting tex output
             title: str='Table title', # Table title
