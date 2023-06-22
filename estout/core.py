@@ -3,7 +3,7 @@
 # %% ../nbs/00_core.ipynb 4
 from __future__ import annotations
 from pathlib import Path 
-from typing import List, Dict, Literal
+from typing import List, Dict, Literal, Union
 import importlib
 
 import numpy as np
@@ -87,6 +87,7 @@ def to_df(res_list: List[dict], # List of outputs from `collect_stats()`
 # %% ../nbs/00_core.ipynb 15
 def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level is kept
                 panel_title: str='',
+                palign: Literal['l','r','c']='l', # Alignment of panel title 
                 col_groups: Dict[str, List[int]]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
                 col_names: List[str]|bool=True, # If False, none; if True, use df column names; if list, gives custom column names
                 hlines: List[int]=[], # Row indices under which to place hline
@@ -101,14 +102,14 @@ def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level
     out = header + '\n'
 
     if panel_title:
-        out += '\\rule{0pt}{3ex} ' + f'\multicolumn{{{nr_cols+1}}}{{@{{}} l}}{{{panel_title}}}' + ' \\\\ \n'
+        out += '\\rule{0pt}{3ex} ' + f'\multicolumn{{{nr_cols+1}}}{{@{{}} {palign}}}{{{panel_title}}}' + ' \\\\ \n'
 
     if col_groups: out += model_groups(col_groups)
     if col_names is True: col_names = [str(x) for x in df.columns]
     if col_names: out += ' & '.join([''] + col_names) + ' \\\\ \n'
     for rownr in range(df.shape[0]):
         out += str(df.index[rownr]) + ' & '  + ' & '.join(list(df.iloc[rownr])) +  ' \\\\ \n' 
-    out = out + footer + ' \n'
+    out = out + footer
 
     linebreaks = [i for i in range(len(out)) if out[i:].startswith('\n')]
     for line_nr, pos in reversed(list(enumerate(linebreaks))):
@@ -127,28 +128,23 @@ def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # (List of) outputs from estout
             font_size: str='\scriptsize', # Gets applied to the table contents as well as its caption
             addtocounter: int=0, # Set to -1 for tables that are just a continuation of a table on a new page
             
-            panel_titles: List[str] = None, # If 'dfs' is list, this param must have the same size as 'dfs' 
-            ptitles_over_columns: bool=True,
-            panel_alignment: str='c',
-            space_bw_panels: str='\\rule{0pt}{3ex}',
-            hlines_under_ptitles: bool=True,
-            tex_tabular_env: str='tabularx',
-
-            column_group_names: Dict[str, List[int]]=None, # see df_to_tex(); if 'dfs' is list, this param must be a list of dicts
-            column_names: List[str]|bool=True, # see df_to_tex(); if 'dfs' is list, this param must be a list of lists
-            hlines: List[int]=[] # see df_to_tex(); if 'dfs' is list, this param must be a list of lists
+            panel_title: List[str]=None, # One element in the list for each dataframe in 'dfs'
+            palign: Literal['l','r','c']='l', # Alignment of panel title 
+            col_groups: List[dict]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
+            col_names: List[Union[list,bool]]=True, # If False, none; if True, use df column names; if list, gives custom column names
+            hlines: List[List[int]]=None, # Row indices under which to place hline
+            tabular_env: str='tabular*' #LaTex tabular environment
             ):
 
-    if isinstance(dfs, pd.DataFrame): 
-        panels = {'': df_to_tex(dfs, column_group_names, column_names, hlines)} 
-        nr_columns = [len(dfs.columns)]
-    if isinstance(dfs, list):
-         panels = {panel_titles[i]: df_to_tex(dfs[i], column_group_names[i], column_names[i], hlines[i])
-                   for i in range(len(dfs))} 
-         nr_columns = [len(dfs[i].columns) for i in range(len(dfs))]
+    if isinstance(dfs, pd.DataFrame): dfs = [dfs]
+    if panel_title is None: panel_title = ['']*len(dfs)
+    if col_groups is None: col_groups = [None]*len(dfs)
+    if col_names in [True, False]: col_names = [col_names]*len(dfs)
+    if hlines is None: hlines = [[]]*len(dfs)
+    body = '\n'.join([df_to_tex(dfs[i], panel_title=panel_title[i], palign=palign, tabular_env=tabular_env,
+                                col_groups=col_groups[i], col_names=col_names[i], hlines=hlines[i]) 
+                      for i in range(len(dfs))])
     
-    body = combine_panels(panels, nr_columns, ptitles_over_columns, panel_alignment, space_bw_panels, hlines_under_ptitles, tex_tabular_env)
-
     pre = "\\newpage \n \\clearpage \n "
     pre += f"\\begin{{{table_type}}}[!h] {font_size} \n"
     pre += f"\\addtocounter{{table}}{{{addtocounter}}} \n"
