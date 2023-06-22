@@ -100,6 +100,8 @@ for res in [sm1, sm2, lmres]:
     allmodels.append(estout.collect_stats(res))
 ```
 
+Then export them to a DataFrame.
+
 ``` python
 estout.to_df(allmodels)
 ```
@@ -189,7 +191,7 @@ estout.to_df(allmodels, add_formats={'params':'{:.3}','r2':'{:.2f}'}, which_xvar
 
 </div>
 
-Replace regressor (or bottom stats) names with labels.
+Replace names of regressor (or bottom stats) with labels.
 
 ``` python
 estout.to_df(allmodels, labels={'cons':'Intercept', 'nobs':'Observations'}, which_xvars=['cons'])
