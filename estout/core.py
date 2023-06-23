@@ -3,7 +3,7 @@
 # %% ../nbs/00_core.ipynb 4
 from __future__ import annotations
 from pathlib import Path 
-from typing import List, Dict, Literal, Union
+from typing import List, Dict, Literal, Union, Callable
 import importlib
 
 import numpy as np
@@ -11,7 +11,7 @@ import pandas as pd
 import statsmodels.api as sm
 from linearmodels import PanelOLS
 
-from .utils import *
+from . import utils 
 
 # %% auto 0
 __all__ = ['collect_stats', 'to_df', 'to_tex', 'to_pdf']
@@ -19,7 +19,7 @@ __all__ = ['collect_stats', 'to_df', 'to_tex', 'to_pdf']
 # %% ../nbs/00_core.ipynb 7
 def collect_stats(res, # Results object to extract stats from
                   get_default_stats = True, # If True, returns all stats implemented by the f'{package}_results' module
-                  add_stats: dict=None, # Keys are stats to extract in addition to the default ones; values are attributes of 'res'
+                  add_stats: dict=None, # Keys are stats to extract in addition to the default ones; values are attributes of 'res' or callables
                   add_literals: dict=None, # Additional info to be added to output dict; values must be scalars
                   ) -> dict:
     """Collects stats from 'res' object. stats in 'add_stats' can override default stats()"""
@@ -29,11 +29,13 @@ def collect_stats(res, # Results object to extract stats from
 
     if get_default_stats:
         for stat in results_module.__all__:
-            out[stat] = rgetattr(results_module, stat)(res)
+            out[stat] = utils.rgetattr(results_module, stat)(res)
 
     if add_stats is not None:
-        for stat, attr in add_stats.items():
-            out[stat] = rgetattr(res, attr)
+        for stat, val in add_stats.items():
+            if isinstance(val, str): out[stat] = utils.rgetattr(res, val)
+            elif isinstance(val, Callable): out[stat] = val(res)
+            else: raise TypeError("Values of add_stats dict must be either strings or callables")
 
     if add_literals is not None:
         out.update(add_literals)
@@ -50,7 +52,7 @@ def to_df(res_list: List[dict], # List of outputs from `collect_stats()`
           ) -> pd.DataFrame: 
     """Combines results from multiple `collect_stats()` outputs into a single pd.DataFrame"""  
     
-    formats = default_formats()
+    formats = utils.default_formats()
     if add_formats is not None: formats.update(add_formats)
     
     columns = []
@@ -59,7 +61,7 @@ def to_df(res_list: List[dict], # List of outputs from `collect_stats()`
         for x in stats_body:
             newcol[x] = newcol[x].map(formats[x].format)
             if x == 'params':
-                newcol[x] += get_stars(res['pvalues'])
+                newcol[x] += utils.get_stars(res['pvalues'])
             else:
                 newcol[x] = '(' + newcol[x] + ')'
         newcol = newcol.stack(level=0) #set_index('coeff_names')
@@ -109,8 +111,9 @@ def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # DataFrame(s) to be converted 
     if col_groups is None: col_groups = [None]*len(dfs)
     if col_names in [True, False]: col_names = [col_names]*len(dfs)
     if hlines is None: hlines = [[]]*len(dfs)
-    body =  '\n \smallskip \n'.join([df_to_tex(dfs[i], panel_title=panel_title[i], palign=palign, tabular_env=tabular_env,
-                                            col_groups=col_groups[i], col_names=col_names[i], hlines=hlines[i]) 
+    body =  '\n \smallskip \n'.join([utils.df_to_tex(dfs[i], panel_title=panel_title[i], 
+                                                        palign=palign, tabular_env=tabular_env,
+                                                        col_groups=col_groups[i], col_names=col_names[i], hlines=hlines[i]) 
                             for i in range(len(dfs))])
     
     pre = "\\newpage \n \\clearpage \n "
@@ -163,5 +166,5 @@ def to_pdf(outfile: str, # Path to .tex file where combined tables are saved (mu
     with open(outfile, "w") as f:
         f.write(content) 
     if make_pdf:
-        pdf_path = make_pdf_from_tex(outfile)
-        if open_pdf: return open_pdf_file(pdf_path)
+        pdf_path = utils.make_pdf_from_tex(outfile)
+        if open_pdf: return utils.open_pdf_file(pdf_path)

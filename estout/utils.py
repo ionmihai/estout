@@ -2,11 +2,9 @@
 
 # %% ../nbs/01_utils.ipynb 3
 from __future__ import annotations
+import os, platform, functools
 from pathlib import Path
-import os
-import platform
 from subprocess import PIPE, Popen, run, SubprocessError
-import functools
 from typing import Dict, List, Tuple, Literal 
 import pandas as pd 
 import numpy as np

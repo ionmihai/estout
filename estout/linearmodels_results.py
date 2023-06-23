@@ -26,7 +26,7 @@ def pvalues(res): return res.pvalues
 def covmat(res): return res.cov
 
 # %% ../nbs/03_linearmodels_results.ipynb 21
-def se(res): return pd.Series(np.sqrt(np.diag(np.array(covmat(res)))),index=xnames(res))
+def se(res): return res.std_errors
 
 # %% ../nbs/03_linearmodels_results.ipynb 23
 def nobs(res): return res.nobs
