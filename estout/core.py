@@ -14,7 +14,7 @@ from linearmodels import PanelOLS
 from .utils import *
 
 # %% auto 0
-__all__ = ['collect_stats', 'to_df', 'to_tex']
+__all__ = ['collect_stats', 'to_df', 'to_tex', 'to_pdf']
 
 # %% ../nbs/00_core.ipynb 7
 def collect_stats(res, # Results object to extract stats from
@@ -134,3 +134,34 @@ def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # DataFrame(s) to be converted 
         with open(outfile, "+w") as f:
             f.write(content) 
     return content
+
+# %% ../nbs/00_core.ipynb 18
+def to_pdf(outfile: str, # Path to .tex file where combined tables are saved (must contain .tex extension)
+            table_tex_code: str|Path|List[Union[str,Path]]=None, # String(s) or Paths to files containing table tex code (e.g. like outputs of to_tex())
+            article_spec=r'\documentclass[11pt]{article}',
+            captionsetup="format=plain, labelsep=newline, labelfont = bf, justification=centering",
+            make_pdf: bool=True, 
+            open_pdf: bool=False):
+    r"""Creates PDF with one or more tables given their tex code (from \being{table} to \end{table})"""
+
+    if isinstance(table_tex_code, str): table_tex_code = [table_tex_code]
+    tex_strings = []
+    for t in table_tex_code:
+        if isinstance(t, Path):
+            with open(t,'r') as f:
+                tex_strings.append(f.read())
+        else: tex_strings.append(t)
+    tables = ' \n '.join(tex_strings)
+
+    preamble = r"\usepackage{booktabs,setspace,graphicx,epstopdf,tabularx, bigstrut,textcomp, outlines}" + "\n"
+    preamble += r"\usepackage{amsmath,amsfonts,amssymb,amsthm,caption}" + "\n"
+    preamble += r"\usepackage[margin=1in]{geometry}" + "\n"
+    preamble += f"\captionsetup{{{captionsetup}}}" + "\n"    
+
+    content = "\n".join([article_spec, preamble, r'\begin{document}', tables, r'\end{document}'])
+
+    with open(outfile, "w") as f:
+        f.write(content) 
+    if make_pdf:
+        pdf_path = make_pdf_from_tex(outfile)
+        if open_pdf: return open_pdf_file(pdf_path)

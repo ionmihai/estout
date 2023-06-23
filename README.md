@@ -66,7 +66,7 @@ estout.collect_stats(sm1)
      x       0.266979
      dtype: float64,
      'nobs': 9,
-     'r2': 0.19260886185799486}
+     'r2': 0.19260886185799475}
 
 Collect statistics by specifying the name of their attribute in the
 results object (using the `add_stats` parameter):
@@ -78,7 +78,7 @@ estout.collect_stats(sm1, get_default_stats=False, add_stats={'xnames': 'model.e
 
     {'package': 'statsmodels',
      'xnames': ['cons', 'x'],
-     'Adj. R2': 0.07726727069485129}
+     'Adj. R2': 0.07726727069485118}
 
 Add scalar statistics not available as attributes of the results object
 (using the `add_literals` paramter):
@@ -235,3 +235,105 @@ df
 | Fixed effects |        | No         | No         | Entity     |
 
 </div>
+
+### Exporting to LaTex
+
+With the `estout.to_tex` function, we can combine one or more DataFrames
+into a single LaTex table (each DataFrame will be a separate panel in
+the LaTex table).
+
+In the example below, we just return the tex code as a string, but the
+function also takes an `outfile` parameter that allows us to store the
+output in a `.tex` file. Either the file path or the string can be used
+in the `estout.to_pdf` function to create a PDF out of this tex code.
+
+``` python
+tbl = estout.to_tex([df,df], panel_title=['Panel A: Some title', 'Panel B: Some title'], 
+               col_groups=[{'Group1':[1,2]}]*2,
+               col_names=[['Model 1', 'Model 2', 'Model 3']]*2,
+               hlines=[[0,1,4,13], [1,4,13]] )
+print(tbl)
+```
+
+    \newpage 
+     \clearpage 
+     \begin{table}[!h] \footnotesize 
+    \addtocounter{table}{0} 
+    \caption{\textbf{Table title}} 
+    \par {Table description} 
+
+     \vspace{2mm} 
+
+     \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l*{3}{c}} 
+     \hline \noalign{\smallskip} 
+    \multicolumn{4}{@{} l}{Panel A: Some title} \\ 
+     \hline \noalign{\smallskip} 
+    & \multicolumn{2}{c}{Group1}  \\ 
+    \cline{2-3}  
+     & Model 1 & Model 2 & Model 3 \\ 
+     \hline \noalign{\smallskip} 
+    cons & 0.51*** & 0.70*** & 0.73*** \\ 
+     & (3.91) & (21.48) & (167.36) \\ 
+    x & 0.35 & 0.57** & 0.64* \\ 
+     & (1.29) & (2.85) & (2.26) \\ 
+    z &  & -0.64** & -0.77** \\ 
+     &  & (-3.55) & (-2.91) \\ 
+    r2 & 0.193 & 0.487 & 0.352 \\ 
+    nobs & 9 & 9 & 9 \\ 
+    Fixed effects & No & No & Entity \\ 
+     \hline \noalign{\smallskip} 
+    \end{tabular*}
+     \smallskip 
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l*{3}{c}} 
+    \multicolumn{4}{@{} l}{Panel B: Some title} \\ 
+     \hline \noalign{\smallskip} 
+    & \multicolumn{2}{c}{Group1}  \\ 
+    \cline{2-3}  
+     & Model 1 & Model 2 & Model 3 \\ 
+     \hline \noalign{\smallskip} 
+    cons & 0.51*** & 0.70*** & 0.73*** \\ 
+     & (3.91) & (21.48) & (167.36) \\ 
+    x & 0.35 & 0.57** & 0.64* \\ 
+     & (1.29) & (2.85) & (2.26) \\ 
+    z &  & -0.64** & -0.77** \\ 
+     &  & (-3.55) & (-2.91) \\ 
+    r2 & 0.193 & 0.487 & 0.352 \\ 
+    nobs & 9 & 9 & 9 \\ 
+    Fixed effects & No & No & Entity \\ 
+     \hline \noalign{\smallskip} 
+    \end{tabular*} 
+    \label{} 
+     \end{table} 
+
+### Exporting to PDF
+
+With the `estout.to_pdf` function, we can combine the LaTex code for
+multiple tables (like the ones produced by `estout.to_tex`) into a
+single .tex document.
+
+By default, the resulting .tex file is run through TexLive’s `pdflatex`
+utility to produce a PDF document with the tables (set `make_pdf`=False
+if you do not want the PDF to be automatically produced).
+
+You can also set `open_pdf` to True if you want the resulting pdf to be
+opened after it is produced.
+
+For the code below to work, you need to have `TexLive` installed (and
+change the path below to a valid path on your system).
+
+``` python
+estout.to_pdf(outfile='../_outputs/paper.tex', 
+              table_tex_code=[tbl, tbl],
+              make_pdf=True,
+              open_pdf=False)
+```
+
+    PDF creation successful!
+
+This produced a PDF with two tables (given by the `tbl` tex string),
+each with two panels (given by the `df` DataFrame above).
+
+Note that the `table_tex_code` parameter also accepts paths to tex
+files. Those tex files must have the complete table environment for that
+table (i.e. from
+).
