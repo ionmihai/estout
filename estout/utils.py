@@ -9,6 +9,7 @@ from subprocess import PIPE, Popen, run, SubprocessError
 import functools
 from typing import Dict, List, Tuple, Literal 
 import pandas as pd 
+import numpy as np
 
 # %% auto 0
 __all__ = ['rgetattr', 'rsetattr', 'default_formats', 'get_stars', 'model_groups', 'tex_table_env', 'df_to_tex',
@@ -104,12 +105,13 @@ def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level
                 palign: Literal['l','r','c']='l', # Alignment of panel title 
                 col_groups: Dict[str, List[int]]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
                 col_names: List[str]|bool=True, # If False, none; if True, use df column names; if list, gives custom column names
-                hlines: List[int]=[], # Row indices under which to place hline
+                hlines: List[int]=[], # Row indices under which to place hline (use 0 for topline). adds \smallskip under each line
                 tabular_env: str='tabular*' #LaTex tabular environment
                 ) -> str: 
     """Creates LaTeX-formatted table from DataFrame."""
 
     nr_cols = len(df.columns)
+    df = df.astype('string')
     if isinstance(df.index, pd.MultiIndex): df = df.droplevel(1)
 
     header,footer = tex_table_env(nr_cols, tabular_env)
@@ -131,7 +133,7 @@ def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level
 
     return out
 
-# %% ../nbs/01_utils.ipynb 18
+# %% ../nbs/01_utils.ipynb 20
 def make_pdf_from_tex(tex_file_path: Path|str) -> Path:
     """Output PDF is created in the same folder as source tex file. Requires TexLive and its pdflatex utility"""
 
@@ -143,7 +145,7 @@ def make_pdf_from_tex(tex_file_path: Path|str) -> Path:
     else: print("PDF creation failed. Errors:", errors.decode('utf-8'))
     return Path(str.replace(str(tex_file_path), '.tex', '.pdf'))
 
-# %% ../nbs/01_utils.ipynb 19
+# %% ../nbs/01_utils.ipynb 21
 def open_pdf_file(file_path):
     try:
         if platform.system() == "Windows": run(['start', file_path])
