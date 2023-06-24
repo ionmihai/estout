@@ -18,11 +18,11 @@ __all__ = ['collect_stats', 'to_df', 'to_tex', 'to_pdf']
 
 # %% ../nbs/00_core.ipynb 7
 def collect_stats(res, # Results object to extract stats from
-                  get_default_stats = True, # If True, returns all stats implemented by the f'{package}_results' module
-                  add_stats: dict=None, # Keys are stats to extract in addition to the default ones; values are attributes of 'res' or callables
+                  get_default_stats = True, # If True, returns all stats implemented by the `f'{package}_results'` module
+                  add_stats: dict=None, # Keys are stats to extract in addition to the default ones; values are attributes of `res` or callables
                   add_literals: dict=None, # Additional info to be added to output dict; values must be scalars
                   ) -> dict:
-    """Collects stats from 'res' object. stats in 'add_stats' can override default stats()"""
+    """Collects stats from `res` object. Stats in `add_stats` can override default stats"""
 
     out = {'package': res.__module__.split('.')[0]}
     results_module = importlib.import_module(f"estout.{out['package']}_results")
@@ -45,12 +45,12 @@ def collect_stats(res, # Results object to extract stats from
 # %% ../nbs/00_core.ipynb 13
 def to_df(res_list: List[dict], # List of outputs from `collect_stats()`
           which_xvars: list=None, # If None, report all xvars
-          stats_body: list=['params', 'tstats'], # Each element of 'res_list' needs to have these stats as keys; values must be pd.Series
-          stats_bottom: list=['r2', 'nobs'], # Each element of 'res_list' needs to have these stats as keys; values must be scalars
+          stats_body: list=['params', 'tstats'], # Each element of `res_list` needs to have these stats as keys; values must be pd.Series
+          stats_bottom: list=['r2', 'nobs'], # Each element of `res_list` needs to have these stats as keys; values must be scalars
           labels: dict=None,
           add_formats: dict=None  
           ) -> pd.DataFrame: 
-    """Combines results from multiple `collect_stats()` outputs into a single pd.DataFrame"""  
+    """Combines results from multiple `collect_stats()` outputs into a single `pd`.DataFrame"""  
     
     formats = utils.default_formats()
     if add_formats is not None: formats.update(add_formats)
@@ -97,7 +97,7 @@ def to_tex(dfs: pd.DataFrame|List[pd.DataFrame], # DataFrame(s) to be converted 
             font_size: str='\\footnotesize', # Gets applied to the table contents as well as its caption
             addtocounter: int=0, # Set to -1 for tables that are just a continuation of a table on a new page
             
-            panel_title: List[str]=None, # One element in the list for each dataframe in 'dfs'
+            panel_title: List[str]=None, # One element in the list for each dataframe in `dfs`
             palign: Literal['l','r','c']='l', # Alignment of panel title 
             col_groups: List[dict]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
             col_names: List[Union[list,bool]]=True, # If False, none; if True, use df column names; if list, gives custom column names

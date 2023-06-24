@@ -38,10 +38,10 @@ def default_formats() -> dict:
             }
 
 # %% ../nbs/01_utils.ipynb 8
-def get_stars(pvalues: pd.Series, # This is compared to key of 'stars' parameter to determine how many stars should be added
+def get_stars(pvalues: pd.Series, # This is compared to key of `stars` param to determine how many stars should be added
             stars: dict = {.1:'*',.05:'**',.01:'***'} # Todo: default values to the left are star symbols that are not rendered correctly in markdown
             ) -> pd.Series:
-    """For each pvalue, check the lowest key in 'stars' for which the pvalue is smaller than that key, and return the corresponding nr of stars."""
+    """For each pvalue, check the lowest key in `stars` for which the pvalue is smaller than that key, and return the corresponding nr of stars."""
 
     param_names = list(pvalues.index)
 
@@ -98,7 +98,7 @@ def tex_table_env(nr_columns: int, # Number of columns in the table
     return header,footer 
 
 # %% ../nbs/01_utils.ipynb 16
-def df_to_tex(df: pd.DataFrame, # If this has a multiindex, only the first level is kept
+def df_to_tex(df: pd.DataFrame, # If this has a MultiIndex, only the first level is kept
                 panel_title: str='',
                 palign: Literal['l','r','c']='l', # Alignment of panel title 
                 col_groups: Dict[str, List[int]]=None, # Keys are group names; values are lists of consecutive indices of columns in the group
