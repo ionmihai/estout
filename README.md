@@ -221,7 +221,7 @@ estout.to_df(allmodels, stats_bottom=['r2'],  which_xvars=['x'])
 Change the formatting for any of the statistics reported.
 
 ``` python
-estout.to_df(allmodels, add_formats={'params':'{:.3}','r2':'{:.2f}'}, which_xvars=['x'])
+estout.to_df(allmodels, add_formats={'params':'{:.3f}','r2':'{:.2f}'}, which_xvars=['x'])
 ```
 
 <div>
