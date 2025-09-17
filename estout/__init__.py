@@ -1,4 +1,4 @@
-__version__ = "0.0.3"
+__version__ = "0.0.5"
 from .core import *
 from . import utils
 from . import linearmodels_results
